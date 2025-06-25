@@ -7,8 +7,8 @@ import { parseColor } from "../helpers/styles";
 
 export function getDocumentColors(document: Document): SMColorAsset[] {
     let sw = document.swatches;
-    if (sw && sw.length) return sw.map(s => ({
-        name: s.name,
+    if (sw && sw.length) return sw.map((s, index) => ({
+        name: (s as any).name || `Swatch ${index + 1}`,
         color: parseColor(s.color),
     }));
     return [];
