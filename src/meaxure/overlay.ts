@@ -32,7 +32,7 @@ function overlay(target: Layer) {
     let overlay = new sketch.ShapePath({ name: 'overlay', parent: container });
     overlay.frame = target.frame.changeBasis({ from: target.parent as Layer, to: root });;
     overlay.sharedStyle = overlayStyle;
-    overlay.style = overlayStyle.style;
+    overlay.style = Object.assign({}, overlayStyle.style);
     overlay.resizingConstraint = ResizingConstraint.top &
         ResizingConstraint.bottom &
         ResizingConstraint.left &

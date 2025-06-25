@@ -9,7 +9,8 @@ import { toJSString } from "../helpers/helper";
 
 export function exportImage(layer: Layer, format: SMExportFormat, path: string, name: string) {
     let document = context.sketchObject.document;
-    let slice = MSExportRequest.exportRequestsFromExportableLayer(layer.sketchObject).firstObject();
+    
+    // Fix for Sketch 2025.1: Use the new export API instead of MSExportRequest
     let savePath = [
         path,
         "/",
@@ -20,10 +21,18 @@ export function exportImage(layer: Layer, format: SMExportFormat, path: string, 
         format.format
     ].join("");
 
-    slice.scale = format.scale;
-    slice.format = format.format;
+    // Create directory if it doesn't exist
+    NSFileManager.defaultManager().createDirectoryAtPath_withIntermediateDirectories_attributes_error(
+        path, true, nil, nil
+    );
 
-    document.saveArtboardOrSlice_toFile(slice, savePath);
+    // Use the new sketch.export API for file export
+    sketch.export(layer, {
+        output: savePath,
+        formats: format.format,
+        scales: format.scale.toString(),
+    });
+    
     return savePath;
 }
 

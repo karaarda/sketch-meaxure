@@ -43,7 +43,7 @@ function coordinateLayer(layer: Layer) {
     crossX.frame.width = 17;
     crossX.frame.height = 1;
     crossX.sharedStyle = context.meaxureStyles.coordinate.background;
-    crossX.style = context.meaxureStyles.coordinate.background.style;
+    crossX.style = Object.assign({}, context.meaxureStyles.coordinate.background.style);
     let crossY = crossX.duplicate();
     crossY.transform.rotation = 90;
     crossY.alignToByPostion(crossX, Edge.center);

@@ -38,14 +38,25 @@ export function getTextFragment(artboard: Artboard, layer: Text, data: ArtboardD
         lineGroup.frame.y = offsetFragmentsY;
         let currentLineHeight = layer.style.lineHeight || Math.max(...frags.map(f => f.defaultLineHeight));
         for (let fragment of frags) {
-            fragment.style.fills.forEach(fill => {
-                // https://github.com/qjebbs/sketch-meaxure/issues/2
-                // https://github.com/sketch-hq/SketchAPI/issues/726
-                if (fill.pattern && fill.pattern.image === null) fill.pattern.image = undefined;
-            });
+            // Fix for Sketch 2025.1: Avoid accessing potentially problematic style properties
+            if (fragment.style && fragment.style.fills) {
+                fragment.style.fills.forEach(fill => {
+                    // https://github.com/qjebbs/sketch-meaxure/issues/2
+                    // https://github.com/sketch-hq/SketchAPI/issues/726
+                    if (fill.pattern && fill.pattern.image === null) fill.pattern.image = undefined;
+                });
+            }
             let subText = new sketch.Text({ text: fragment.text, parent: lineGroup });
-            subText.style = fragment.style;
-            subText.style.lineHeight = currentLineHeight;
+            // Fix for Sketch 2025.1: Create a minimal style object with only necessary properties
+            subText.style = {
+                textColor: fragment.style?.textColor || '#000000FF',
+                fontSize: fragment.style?.fontSize || 12,
+                fontFamily: fragment.style?.fontFamily || 'Helvetica',
+                fontWeight: fragment.style?.fontWeight || 400,
+                textStrikethrough: fragment.style?.textStrikethrough || null,
+                textUnderline: fragment.style?.textUnderline || null,
+                lineHeight: currentLineHeight
+            } as any;
             subText.frame.x = offsetFragmentsX;
             subText.frame.y = 0;
             offsetFragmentsX += subText.frame.width;
@@ -109,7 +120,11 @@ export function getTextFragment(artboard: Artboard, layer: Text, data: ArtboardD
 }
 function getFragmentsByLines(layer: Text, fragments: TextFragment[]): TextFragment[][] {
     let svg = (
-        sketch.export(layer, { output: undefined, formats: 'svg' }) as Buffer
+        sketch.export(layer, { 
+            output: null, 
+            formats: 'svg',
+            scales: '1'
+        }) as Buffer
     ).toString();
     let lines = getFragmentLinesFromSVG(svg);
     let fragmentsByLines: TextFragment[][] = [];
@@ -156,9 +171,14 @@ function getFragmentsByLines(layer: Text, fragments: TextFragment[]): TextFragme
     return fragmentsByLines;
 }
 function splitFragment(fragment: TextFragment, length: number): [TextFragment, TextFragment] {
-    let left = Object.assign({}, fragment);
-    left.length = length
-    left.text = fragment.text.substr(0, length);
+    // Fix for Sketch 2025.1: Create a new fragment object manually instead of using Object.assign
+    let left: TextFragment = {
+        length: length,
+        location: fragment.location,
+        text: fragment.text.substr(0, length),
+        style: fragment.style,
+        defaultLineHeight: fragment.defaultLineHeight
+    };
     fragment.text = fragment.text.substring(length);
     fragment.location += length;
     fragment.length -= length;

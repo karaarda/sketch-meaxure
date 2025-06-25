@@ -41,9 +41,9 @@ function createMeterHorizontal(
 
     if (options.background) {
         start.sharedStyle = options.background;
-        start.style = options.background.style;
+        start.style = Object.assign({}, options.background.style);
         body.sharedStyle = options.background;
-        body.style = options.background.style;
+        body.style = Object.assign({}, options.background.style);
     }
     let end = start.duplicate();
     start.alignTo(
@@ -88,9 +88,9 @@ function createMeterVertical(
 
     if (options.background) {
         start.sharedStyle = options.background;
-        start.style = options.background.style;
+        start.style = Object.assign({}, options.background.style);
         body.sharedStyle = options.background;
-        body.style = options.background.style;
+        body.style = Object.assign({}, options.background.style);
     }
     let end = start.duplicate();
     start.alignTo(
@@ -131,11 +131,11 @@ export function createLabel(
     let text = new sketch.Text({ name: 'text', text: content, parent: container });
     if (options.foreground) {
         text.sharedStyle = options.foreground;
-        text.style = options.foreground.style;
+        text.style = Object.assign({}, options.foreground.style);
     }
     if (options.background) {
         box.sharedStyle = options.background;
-        box.style = options.background.style;
+        box.style = Object.assign({}, options.background.style);
     }
     text.textBehaviour = TextBehaviour.fixedSize;
     text.resizingConstraint = ResizingConstraint.top &
@@ -202,7 +202,7 @@ function createArrowFor(
     let arrow = new sketch.ShapePath({ name: 'arrow', parent: target.parent as Group });
     if (options.background) {
         arrow.sharedStyle = options.background;
-        arrow.style = options.background.style;
+        arrow.style = Object.assign({}, options.background.style);
     }
     arrow.frame.width = 6;
     arrow.frame.height = 6;

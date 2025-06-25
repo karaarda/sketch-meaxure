@@ -115,7 +115,7 @@ function makeBorder(color: string): Border {
 
 function maskSharedStyle(document: Document, name: string, override: any, type: 'text' | 'layer'): SharedStyle {
     let base: Style = type == 'layer' ? makeBaseLayerStyle() : makeBaseTextStyle();
-    let style = Object.assign<Style, any>(base, override);
+    let style = { ...base, ...override } as any;
     let sharedStyle = sketch.SharedStyle.fromStyle({ name: name, document: document, style: style });
     return sharedStyle
 }
