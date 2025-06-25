@@ -15,6 +15,9 @@ export function exportImage(layer: Layer, format: SMExportFormat, path: string, 
         path,
         "/",
         format.prefix,
+    ].join("");
+
+    let fileName = [
         name,
         format.suffix,
         ".",
@@ -29,11 +32,12 @@ export function exportImage(layer: Layer, format: SMExportFormat, path: string, 
     // Use the new sketch.export API for file export
     sketch.export(layer, {
         output: savePath,
+        filename: fileName,
         formats: format.format,
         scales: format.scale.toString(),
     });
-    
-    return savePath;
+
+    return savePath + "/" + fileName;
 }
 
 export function exportImageToBuffer(layer: Layer, format: SMExportFormat): Buffer {
